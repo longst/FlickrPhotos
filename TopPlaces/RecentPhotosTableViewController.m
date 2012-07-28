@@ -11,7 +11,6 @@
 
 @interface RecentPhotosTableViewController ()
 - (NSArray *)initialModel;
-
 @end
 
 @implementation RecentPhotosTableViewController

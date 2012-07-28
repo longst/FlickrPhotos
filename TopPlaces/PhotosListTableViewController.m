@@ -23,7 +23,6 @@
 
 #pragma mark getter and setter
 - (void)setPhotos:(NSArray *)photos{
-    NSLog(@"photos %@", photos);
     if (_photos != photos) {
         _photos = photos;
     }

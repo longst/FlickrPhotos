@@ -7,12 +7,10 @@
 //
 
 #import "RecentPhotosTableViewController.h"
-#import "PhotoViewController.h"
 #import "NSUserDefaultKey.h"
-#import "FlickrFetcher.h"
 
 @interface RecentPhotosTableViewController ()
-//- (NSArray *)initialModel;
+- (NSArray *)initialModel;
 
 @end
 
@@ -39,9 +37,6 @@
     NSArray *photoList = [[[defaults objectForKey:RECENT_PHOTOS_LIST_KEY] reverseObjectEnumerator] allObjects];
     return photoList;
 }
-
-
-
 
 
 

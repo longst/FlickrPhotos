@@ -26,7 +26,6 @@
     NSLog(@"photos %@", photos);
     if (_photos != photos) {
         _photos = photos;
-        
     }
     if (self.tableView.window) [self.tableView reloadData];
 }
@@ -36,10 +35,8 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     NSLog(@"segue called");
     
-    if ([segue.identifier isEqualToString:@"showAPhoto"]) {
-        NSDictionary *photo = [self.photos objectAtIndex:self.tableView.indexPathForSelectedRow.row];
-        [[segue destinationViewController] setPhoto:photo];
-    }
+    NSDictionary *photo = [self.photos objectAtIndex:self.tableView.indexPathForSelectedRow.row];
+    [[segue destinationViewController] setPhoto:photo];
 }
 
 
@@ -88,7 +85,6 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
-    
     
     // get photo index dic
     NSDictionary *photo = [self.photos objectAtIndex:indexPath.row];

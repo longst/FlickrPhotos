@@ -1,0 +1,263 @@
+//
+//  TopPlacesTableViewController.m
+//  TopPlaces
+//
+//  Created by Shitian Long on 7/25/12.
+//  Copyright (c) 2012 OptiCaller Software AB. All rights reserved.
+//
+
+#import "TopPlacesTableViewController.h"
+#import "FlickrFetcher.h"
+
+@interface TopPlacesTableViewController ()
+
+// extra task, photo by countries data structure
+@property (nonatomic, strong) NSDictionary *photosByCountries;
+
+// activities indicator outlet, TODO think about implementation
+@property (nonatomic, weak) IBOutlet UIActivityIndicatorView *activityIndicatorView;
+
+- (NSString *)getPhotoRest:(NSDictionary *)photoDic;
+- (NSString *)getPhotoCityName:(NSDictionary *)photoDic;
+- (NSString *)getPhotoCountry:(NSDictionary *)photoDic;
+- (NSString *)getCountryNameByPhotos:(NSInteger)section;
+- (NSArray *)getLocationPhotosList:(NSDictionary *)photoDic;
+- (NSArray *)sortAlphabeticalOrder:(NSArray *)source;
+
+
+@end
+
+@implementation TopPlacesTableViewController
+
+@synthesize photos = _photos;
+@synthesize photosByCountries = _photosByCountries;
+
+- (void)setPhotos:(NSArray *)photos{
+    
+    if (_photos != photos) {
+        _photos = photos;
+        // update countries list each time photos dictionary updated
+        [self updatePhotosByCountrise];
+        
+        // obly tableView reload when tableview is active
+        if (self.tableView.window) {
+            [self.tableView reloadData];
+        }
+    }
+}
+
+
+#pragma mark - top place view life cycle
+- (void)viewDidLoad{
+    [super viewDidLoad];
+    
+    //TODO Think about change position of activity indicator, does not work properly....
+    self.activityIndicatorView.hidden = YES;
+    [self.view addSubview: self.activityIndicatorView];
+    
+}
+
+
+#pragma mark - Segue handleing
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+
+    //TODO Activity indicator
+    self.activityIndicatorView.hidden = NO;
+    [self.activityIndicatorView startAnimating];
+    
+
+    if ([segue.identifier isEqualToString:@"showPhotoList"]){
+        // get select section
+        NSString *photoByCountry = [self photosByCountriesForSection: self.tableView.indexPathForSelectedRow.section];
+        
+        // get country array
+        NSArray *photoByCountryList = [self.photosByCountries objectForKey:photoByCountry];
+        
+        // get photo index dic
+        NSDictionary *photoDic = [photoByCountryList objectAtIndex:self.tableView.indexPathForSelectedRow.row];
+        
+        //multi-thread
+        dispatch_queue_t downloadQueue = dispatch_queue_create("top place download", NULL);
+        dispatch_async(downloadQueue, ^{
+            NSArray *photosListFromLocation = [self getLocationPhotosList:photoDic];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[segue destinationViewController] setPhotos:photosListFromLocation];
+            });
+        });
+    }
+    
+}
+
+
+#pragma mark - IBAction
+- (IBAction)refresh:(UIBarButtonItem *)sender {
+    UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [spinner startAnimating];
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinner];
+    
+    dispatch_queue_t downloadQueue = dispatch_queue_create("top place download", NULL);
+    
+    dispatch_async(downloadQueue, ^{
+        NSArray *photos = [FlickrFetcher topPlaces];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.navigationItem.rightBarButtonItem = sender;
+            self.photos = photos;
+        });
+    });
+    dispatch_release(downloadQueue);
+    
+}
+
+
+#pragma mark - private methods
+// Task 4 fetch photo list from Flickr
+- (NSArray *)getLocationPhotosList:(NSDictionary *)photoDic{
+    return [FlickrFetcher photosInPlace:photoDic maxResults:50];
+}
+
+
+// Task 3 get photo city name
+- (NSString *)getPhotoCityName:(NSDictionary *)photoDic{
+    NSString * content = [photoDic objectForKey:FLICKR_PLACE_NAME];
+    NSRange range = [content rangeOfString:@","];
+    NSString *cityName = [content substringToIndex:range.location];
+    
+    // if string end with space, remove space
+    if ([cityName hasSuffix:@" "]) cityName = [cityName substringToIndex:([cityName length]-1)];
+    
+    //NSLog(@"city Name is %@", cityName);
+    return cityName;
+}
+
+
+// Task 3 get rest of photo information
+- (NSString *)getPhotoRest:(NSDictionary *)photoDic{
+    NSString * content = [photoDic objectForKey:FLICKR_PLACE_NAME];
+    NSRange range = [content rangeOfString:@","];
+    // remove ", " two characters
+    NSString *restName = [content substringFromIndex:(range.location+2)];
+    //NSLog(@"city Name is %@", restName);
+    return restName;
+}
+
+
+// Task 2 sort in alphabet order
+- (NSArray *)sortAlphabeticalOrder:(NSArray *)source{
+    return[source sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
+}
+
+
+// Extra task, update photo countries data structure according to photo dictories
+- (void)updatePhotosByCountrise{
+    NSMutableDictionary *photosByCountries = [NSMutableDictionary dictionary];
+    
+    for (NSDictionary *photo in self.photos) {
+        
+        // get countries name
+        NSString *countryOfPhoto = [self getPhotoCountry:photo];
+        
+        // build counties photos array
+        NSMutableArray *countryOfPhotoArray = [photosByCountries objectForKey:countryOfPhoto];
+        
+        //either initial countries photos array or add an element in to countries photo array
+        if (!countryOfPhotoArray) {
+            countryOfPhotoArray = [NSMutableArray array];
+            [photosByCountries setObject:countryOfPhotoArray forKey:countryOfPhoto];
+        }
+        
+        [countryOfPhotoArray addObject:photo];
+        
+        // Think about sort countries alphabetical
+        //countryOfPhotoArray = [self arrayInAlphabeticalOrder:countryOfPhotoArray];
+        
+    }
+    
+    self.photosByCountries = photosByCountries;
+}
+
+
+// extra task, get photo country name
+#define FLICKR_PHOTO_POSITION 2
+- (NSString *)getPhotoCountry:(NSDictionary *)photoDic{
+    NSString * content = [photoDic objectForKey:FLICKR_PLACE_NAME];
+    NSArray *photoContentElement = [content componentsSeparatedByString:@","];
+    NSString *photoCountry = nil;
+    if ([photoContentElement count] == 3){
+        photoCountry = [photoContentElement objectAtIndex:FLICKR_PHOTO_POSITION];
+        // remove space
+        if ([photoCountry hasPrefix:@" "]) photoCountry = [photoCountry substringFromIndex:1];
+    }
+    else {
+        photoCountry = @"Unknow country";
+    }
+    
+    return photoCountry;
+}
+
+
+# pragma mark table view index and section handling
+- (NSString *)getCountryNameByPhotos:(NSInteger)section{
+    return [[self.photosByCountries allKeys] objectAtIndex:section];
+}
+
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return [self.photosByCountries count];
+}
+
+
+- (NSString *)photosByCountriesForSection:(NSInteger)section{
+    NSArray *sortCountriesList = [self sortAlphabeticalOrder:[self.photosByCountries allKeys]];
+    
+    return [sortCountriesList objectAtIndex:section];
+}
+
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
+    return [self photosByCountriesForSection:section];
+}
+
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    NSString *photoByCountry = [self photosByCountriesForSection:section];
+    NSArray *photoByCountryList = [self.photosByCountries objectForKey:photoByCountry];
+    return [photoByCountryList count];
+}
+
+
+# pragma mark table view delegate
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    static NSString *CellIdentifier = @"FlickrPhoto";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+    }
+    
+    // get country name
+    NSString *photoByCountry = [self photosByCountriesForSection:indexPath.section];
+    
+    // get country array
+    NSArray *photoByCountryList = [self.photosByCountries objectForKey:photoByCountry];
+    
+    // get photo index dic
+    NSDictionary *photo = [photoByCountryList objectAtIndex:indexPath.row];
+    
+    cell.textLabel.text = [self getPhotoCityName:photo];
+    cell.detailTextLabel.text = [self getPhotoRest:photo];
+    return cell;
+}
+
+
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return YES;
+}
+
+@end

@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 OptiCaller Software AB. All rights reserved.
 //
 
+#import <UIKit/UIKit.h>
 #import "PhotosListTableViewController.h"
 
 @interface RecentPhotosTableViewController : PhotosListTableViewController

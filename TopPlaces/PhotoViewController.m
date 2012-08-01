@@ -20,6 +20,8 @@
 - (void)addPhotoToRecent:(NSDictionary *)photoElement;
 - (NSMutableArray *)addUniquePhotoToList:(NSMutableArray *)photoList WithPhoto:(NSDictionary *)photoElement;
 
+- (float) scaleRatio;
+
 @end
 
 @implementation PhotoViewController
@@ -37,11 +39,10 @@
     // set delegate
     self.scrollView.delegate = self;
     
-    // convert image URL to image
     NSData *imageData = [NSData dataWithContentsOfURL:[FlickrFetcher urlForPhoto:self.photo format:FlickrPhotoFormatLarge]];
-    
-    // set image
     self.imageView.image = [UIImage imageWithData:imageData];
+    // seems does not work properly for request task 8....
+    self.imageView.contentMode = UIViewContentModeScaleToFill;
     
     self.title = [self.photo objectForKey:PHOTO_TITLE_KEY];
     
@@ -49,10 +50,21 @@
     self.scrollView.contentSize = self.imageView.image.size;
     
     //setup the frame of the image
-
-    self.imageView.frame = CGRectMake(0, 0, self.imageView.image.size.width, self.imageView.image.size.height);
     
+    self.imageView.frame = CGRectMake(0, 0, self.imageView.image.size.width, self.imageView.image.size.height);
 	// Do any additional setup after loading the view.
+}
+
+
+- (float) scaleRatio{
+    float scaleRatio = 1.0;
+    if (self.imageView.image.size.width > self.imageView.image.size.height) {
+        scaleRatio = self.imageView.image.size.height / self.view.frame.size.height;
+    }
+    else{
+        scaleRatio = self.imageView.image.size.width / self.view.frame.size.width;
+    }
+    return scaleRatio;
 }
 
 
@@ -81,7 +93,7 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return YES;
 }
 
 

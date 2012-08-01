@@ -14,10 +14,6 @@
                         <rect key="frame" x="0.0" y="64" width="320" height="367"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <activityIndicatorView key="tableFooterView" opaque="NO" contentMode="scaleToFill" style="gray" id="lMt-ZD-Fci">
-                            <rect key="frame" x="0.0" y="66" width="320" height="20"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </activityIndicatorView>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="FlickrPhoto" textLabel="G3t-Ac-Wfd" detailTextLabel="eiP-Yr-6ef" style="IBUITableViewCellStyleSubtitle" id="55i-aR-Rf4">
                                 <rect key="frame" x="0.0" y="22" width="320" height="44"/>
@@ -60,9 +56,6 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                    <connections>
-                        <outlet property="activityIndicatorView" destination="lMt-ZD-Fci" id="2OY-5N-fK2"/>
-                    </connections>
                 </tableViewController>
             </objects>
             <point key="canvasLocation" x="1310" y="108"/>
@@ -271,7 +264,6 @@
             <source key="sourceIdentifier" type="project" relativePath="./Classes/TopPlacesTableViewController.h"/>
             <relationships>
                 <relationship kind="action" name="refresh:" candidateClass="UIBarButtonItem"/>
-                <relationship kind="outlet" name="activityIndicatorView" candidateClass="UIActivityIndicatorView"/>
             </relationships>
         </class>
     </classes>

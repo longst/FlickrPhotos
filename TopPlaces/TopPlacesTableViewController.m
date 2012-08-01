@@ -14,8 +14,6 @@
 // extra task, photo by countries data structure
 @property (nonatomic, strong) NSDictionary *photosByCountries;
 
-// activities indicator outlet, TODO think about implementation
-@property (nonatomic, weak) IBOutlet UIActivityIndicatorView *activityIndicatorView;
 
 - (NSString *)getPhotoRest:(NSDictionary *)photoDic;
 - (NSString *)getPhotoCityName:(NSDictionary *)photoDic;
@@ -27,7 +25,15 @@
 
 @end
 
+typedef enum{
+    SORT_BY_STRING,
+    SROT_BY_DIC,
+    SROT_BY_UNKNOW,
+}SORT_REF;
+
+
 @implementation TopPlacesTableViewController
+
 
 @synthesize photos = _photos;
 @synthesize photosByCountries = _photosByCountries;
@@ -47,25 +53,25 @@
 }
 
 
+
 #pragma mark - top place view life cycle
 - (void)viewDidLoad{
     [super viewDidLoad];
-    
-    //TODO Think about change position of activity indicator, does not work properly....
-    self.activityIndicatorView.hidden = YES;
-    [self.view addSubview: self.activityIndicatorView];
     
 }
 
 
 #pragma mark - Segue handleing
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-
-    //TODO Activity indicator
-    self.activityIndicatorView.hidden = NO;
-    [self.activityIndicatorView startAnimating];
     
-
+    
+    // TODO.think about how it works
+    /**
+     UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+     [spinner startAnimating];
+     [self.view addSubview:spinner];
+     */
+    
     if ([segue.identifier isEqualToString:@"showPhotoList"]){
         // get select section
         NSString *photoByCountry = [self photosByCountriesForSection: self.tableView.indexPathForSelectedRow.section];
@@ -85,6 +91,8 @@
             });
         });
     }
+    [[self.view.subviews mutableCopy] removeLastObject];
+    
     
 }
 
@@ -142,9 +150,51 @@
 }
 
 
+
 // Task 2 sort in alphabet order
 - (NSArray *)sortAlphabeticalOrder:(NSArray *)source{
-    return[source sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
+    
+    SORT_REF sort_reference;
+    
+    // in this case, we assume that array carray same type of element
+    id element = [source objectAtIndex:0];
+    
+    if ([element respondsToSelector:@selector(caseInsensitiveCompare:)]) {
+        sort_reference = SORT_BY_STRING;
+    }
+    else if ([element isKindOfClass:[NSDictionary class]]){
+        sort_reference = SROT_BY_DIC;
+    }
+    else{
+        sort_reference = SROT_BY_UNKNOW;
+    }
+    
+    
+    NSArray *sortedArray = nil;
+    
+    switch (sort_reference) {
+        case SORT_BY_STRING:{
+            sortedArray = [source sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
+            break;
+        }
+            
+        case SROT_BY_DIC:{
+            NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:FLICKR_PLACE_NAME ascending:YES];
+            
+            sortedArray = [[source mutableCopy] sortedArrayUsingDescriptors:[NSArray arrayWithObjects:descriptor,nil]];
+            break;
+        }
+            
+        case SROT_BY_UNKNOW:{
+            sortedArray = source;
+            break;
+        }
+            
+        default:
+            break;
+    }
+    
+    return sortedArray;
 }
 
 
@@ -167,9 +217,13 @@
         }
         
         [countryOfPhotoArray addObject:photo];
-        
-        // Think about sort countries alphabetical
-        //countryOfPhotoArray = [self arrayInAlphabeticalOrder:countryOfPhotoArray];
+    }
+    
+    // sort photos according alphabetucal in array
+    NSArray *countryList = [photosByCountries allKeys];
+    for (int i = 0; i < [countryList count]; i ++) {
+        NSArray *sortArray = [self sortAlphabeticalOrder:(NSArray *)[photosByCountries objectForKey:[countryList objectAtIndex:i]]];
+        [photosByCountries setObject:sortArray forKey:[countryList objectAtIndex:i]];
         
     }
     
@@ -244,6 +298,9 @@
     
     // get country array
     NSArray *photoByCountryList = [self.photosByCountries objectForKey:photoByCountry];
+    
+    // sort array
+    //photoByCountryList = [self sortAlphabeticalOrder:photoByCountryList];
     
     // get photo index dic
     NSDictionary *photo = [photoByCountryList objectAtIndex:indexPath.row];

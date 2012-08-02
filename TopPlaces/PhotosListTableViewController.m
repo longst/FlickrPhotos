@@ -45,9 +45,11 @@
     if (!photoTitle) {
         photoTitle = [self getPhotoDescription:photoDic];
     }
-    if (!photoTitle){
+    // in the case of "NO Photo Title" photo title can be either "nil" or @""
+    if (!photoTitle || [photoTitle length] == 0){
         photoTitle = @"unknow";
     }
+    
     
     return photoTitle;
 }

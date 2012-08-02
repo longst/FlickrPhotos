@@ -12,8 +12,6 @@
 
 @interface PhotosListTableViewController ()
 
-- (NSString *)getPhotoTitle:(NSDictionary *)photoDic;
-- (NSString *)getPhotoDescription:(NSDictionary *)photoDic;
 
 @end
 
@@ -45,7 +43,7 @@
     
     // according to task 5 if title is nil put description as title
     if (!photoTitle) {
-        photoTitle = [[photoDic objectForKey:@"description"] objectForKey:@"_content"];
+        photoTitle = [self getPhotoDescription:photoDic];
     }
     if (!photoTitle){
         photoTitle = @"unknow";
@@ -91,6 +89,13 @@
     cell.textLabel.text = [self getPhotoTitle:photo];
     cell.detailTextLabel.text = [self getPhotoDescription:photo];
     return cell;
+}
+
+
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return YES;
 }
 
 

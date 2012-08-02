@@ -17,10 +17,6 @@
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 
-- (void)addPhotoToRecent:(NSDictionary *)photoElement;
-- (NSMutableArray *)addUniquePhotoToList:(NSMutableArray *)photoList WithPhoto:(NSDictionary *)photoElement;
-
-- (float) scaleRatio;
 
 @end
 

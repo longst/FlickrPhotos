@@ -10,29 +10,22 @@
 #import "NSUserDefaultKey.h"
 
 @interface RecentPhotosTableViewController ()
-- (NSArray *)initialModel;
+
 @end
 
 @implementation RecentPhotosTableViewController
 
-
-
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     
-    // read photo list from user default
-    NSArray *photosList = [self initialModel];
-    
-    // if photo list update, load new photo list structure to model and reload table view
-    if (![photosList isEqual:self.photos]) {
-        self.photos = photosList;
-        [self.tableView reloadData];
-    }
+    // read from UserDefault
+    self.photos = [self initialModel];
 }
-
 
 - (NSArray *)initialModel{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    // load list and reverse object order
     NSArray *photoList = [[[defaults objectForKey:RECENT_PHOTOS_LIST_KEY] reverseObjectEnumerator] allObjects];
     return photoList;
 }

@@ -51,8 +51,6 @@ typedef enum{
 
 #pragma mark - Segue handleing
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-    
-    
     // TODO.think about how it works
     /**
      UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
@@ -84,20 +82,36 @@ typedef enum{
     
 }
 
+#pragma mark - view life cycle
+- (void)viewDidLoad{
+    [super viewDidLoad];
+    
+    // automatic load the list when application start
+    if (!self.photos) {
+        [self downloadFlickrFetcher:nil];
+    }
+    
+}
 
 #pragma mark - IBAction
 - (IBAction)refresh:(UIBarButtonItem *)sender {
     UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     [spinner startAnimating];
-    
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinner];
-    
+    [self downloadFlickrFetcher:sender];
+}
+
+
+#pragma mark - download process
+- (void)downloadFlickrFetcher:(id)sender{
     dispatch_queue_t downloadQueue = dispatch_queue_create("top place download", NULL);
     
     dispatch_async(downloadQueue, ^{
         NSArray *photos = [FlickrFetcher topPlaces];
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.navigationItem.rightBarButtonItem = sender;
+            if ([sender isKindOfClass:[UIBarButtonItem class]]) {
+                self.navigationItem.rightBarButtonItem = sender;
+            }
             self.photos = photos;
         });
     });
@@ -224,11 +238,16 @@ typedef enum{
 #define FLICKR_PHOTO_POSITION 2
 - (NSString *)getPhotoCountry:(NSDictionary *)photoDic{
     NSString * content = [photoDic objectForKey:FLICKR_PLACE_NAME];
+    
+    // meta data from Fickr: Ivins, Utah, United States
+    
     NSArray *photoContentElement = [content componentsSeparatedByString:@","];
+
+    // arrary will be {Ivins, Utah, United States}
     NSString *photoCountry = nil;
     if ([photoContentElement count] == 3){
         photoCountry = [photoContentElement objectAtIndex:FLICKR_PHOTO_POSITION];
-        // remove space
+        // remove space in front of element
         if ([photoCountry hasPrefix:@" "]) photoCountry = [photoCountry substringFromIndex:1];
     }
     else {

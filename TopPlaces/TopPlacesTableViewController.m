@@ -14,14 +14,9 @@
 // extra task, photo by countries data structure
 @property (nonatomic, strong) NSDictionary *photosByCountries;
 
-
-- (NSString *)getPhotoRest:(NSDictionary *)photoDic;
-- (NSString *)getPhotoCityName:(NSDictionary *)photoDic;
-- (NSString *)getPhotoCountry:(NSDictionary *)photoDic;
-- (NSString *)getCountryNameByPhotos:(NSInteger)section;
-- (NSArray *)getLocationPhotosList:(NSDictionary *)photoDic;
-- (NSArray *)sortAlphabeticalOrder:(NSArray *)source;
-
+// new property for maintain countries list in alphabetical order
+// avoid mulitple times sort
+@property (nonatomic, strong) NSArray *countriesInAlpha;
 
 @end
 
@@ -37,9 +32,10 @@ typedef enum{
 
 @synthesize photos = _photos;
 @synthesize photosByCountries = _photosByCountries;
+@synthesize countriesInAlpha = _countriesInAlpha;
+
 
 - (void)setPhotos:(NSArray *)photos{
-    
     if (_photos != photos) {
         _photos = photos;
         // update countries list each time photos dictionary updated
@@ -50,14 +46,6 @@ typedef enum{
             [self.tableView reloadData];
         }
     }
-}
-
-
-
-#pragma mark - top place view life cycle
-- (void)viewDidLoad{
-    [super viewDidLoad];
-    
 }
 
 
@@ -169,7 +157,6 @@ typedef enum{
         sort_reference = SROT_BY_UNKNOW;
     }
     
-    
     NSArray *sortedArray = nil;
     
     switch (sort_reference) {
@@ -219,13 +206,15 @@ typedef enum{
         [countryOfPhotoArray addObject:photo];
     }
     
-    // sort photos according alphabetucal in array
+    // sort cities photos according alphabetucal in array
     NSArray *countryList = [photosByCountries allKeys];
     for (int i = 0; i < [countryList count]; i ++) {
         NSArray *sortArray = [self sortAlphabeticalOrder:(NSArray *)[photosByCountries objectForKey:[countryList objectAtIndex:i]]];
         [photosByCountries setObject:sortArray forKey:[countryList objectAtIndex:i]];
-        
     }
+    
+    // sort countries according alphabetical
+    self.countriesInAlpha = [self sortAlphabeticalOrder:countryList];
     
     self.photosByCountries = photosByCountries;
 }
@@ -263,8 +252,7 @@ typedef enum{
 
 
 - (NSString *)photosByCountriesForSection:(NSInteger)section{
-    NSArray *sortCountriesList = [self sortAlphabeticalOrder:[self.photosByCountries allKeys]];
-    
+    NSArray *sortCountriesList = self.countriesInAlpha;
     return [sortCountriesList objectAtIndex:section];
 }
 
@@ -298,9 +286,7 @@ typedef enum{
     
     // get country array
     NSArray *photoByCountryList = [self.photosByCountries objectForKey:photoByCountry];
-    
-    // sort array
-    //photoByCountryList = [self sortAlphabeticalOrder:photoByCountryList];
+
     
     // get photo index dic
     NSDictionary *photo = [photoByCountryList objectAtIndex:indexPath.row];

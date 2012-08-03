@@ -110,15 +110,11 @@
 // controller. Therefore make the code clearer, we performSegueWithIdentifier in this tableview delegate function
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
+    // if iPad there is no segue. 
     if ([self splitViewPhotoViewController]) {
         NSDictionary *photo = [self.photos objectAtIndex:indexPath.row];
         [[self splitViewPhotoViewController] setPhoto:photo];
     }
-    else{
-        // sender is not needed
-        [self performSegueWithIdentifier:@"showAPhoto" sender:nil];
-    }
-
 }
 
 

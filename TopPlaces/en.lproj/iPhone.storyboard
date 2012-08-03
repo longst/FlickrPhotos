@@ -138,7 +138,7 @@
                     </connections>
                 </viewController>
             </objects>
-            <point key="canvasLocation" x="2256" y="213"/>
+            <point key="canvasLocation" x="2356" y="733"/>
         </scene>
         <!--Recent Photos Table View Controller - Recent-->
         <scene sceneID="nBX-Wy-FRP">
@@ -187,7 +187,7 @@
                     <navigationItem key="navigationItem" title="Recent" id="x8I-yh-XNS"/>
                 </tableViewController>
             </objects>
-            <point key="canvasLocation" x="1670" y="717"/>
+            <point key="canvasLocation" x="1334" y="745"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="Pqt-1j-cce">
@@ -243,7 +243,7 @@
                     </connections>
                 </navigationController>
             </objects>
-            <point key="canvasLocation" x="885" y="705"/>
+            <point key="canvasLocation" x="885" y="745"/>
         </scene>
     </scenes>
     <classes>
@@ -252,6 +252,7 @@
             <relationships>
                 <relationship kind="outlet" name="imageView" candidateClass="UIImageView"/>
                 <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
+                <relationship kind="outlet" name="toolbar" candidateClass="UIToolbar"/>
             </relationships>
         </class>
         <class className="PhotosListTableViewController" superclassName="UITableViewController">
@@ -273,6 +274,6 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="S4r-e5-EcJ"/>
+        <segue reference="aW4-8P-VsB"/>
     </inferredMetricsTieBreakers>
 </document>

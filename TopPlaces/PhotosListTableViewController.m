@@ -30,10 +30,11 @@
 
 #pragma mark segure section
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-    NSLog(@"segue called");
     
-    NSDictionary *photo = [self.photos objectAtIndex:self.tableView.indexPathForSelectedRow.row];
-    [[segue destinationViewController] setPhoto:photo];
+    if ([segue.identifier isEqualToString:@"showAPhoto"]) {
+        NSDictionary *photo = [self.photos objectAtIndex:self.tableView.indexPathForSelectedRow.row];
+        [[segue destinationViewController] setPhoto:photo];
+    }
 }
 
 
@@ -69,6 +70,16 @@
 }
 
 
+- (PhotoViewController *)splitViewPhotoViewController{
+    id photoViewController = [self.splitViewController.viewControllers lastObject];
+    
+    if (![photoViewController isKindOfClass:[PhotoViewController class]]) {
+        photoViewController = nil;
+    }
+    return photoViewController;
+}
+
+
 #pragma mark table view delegate
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
@@ -93,6 +104,22 @@
     return cell;
 }
 
+
+
+// This function is updated, think about iPad case, which PhotoViewController is not in a segue but in the splite view
+// controller. Therefore make the code clearer, we performSegueWithIdentifier in this tableview delegate function
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    if ([self splitViewPhotoViewController]) {
+        NSDictionary *photo = [self.photos objectAtIndex:indexPath.row];
+        [[self splitViewPhotoViewController] setPhoto:photo];
+    }
+    else{
+        // sender is not needed
+        [self performSegueWithIdentifier:@"showAPhoto" sender:nil];
+    }
+
+}
 
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

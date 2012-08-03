@@ -16,7 +16,7 @@
 @interface PhotoViewController ()<UIScrollViewDelegate>
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
-
+@property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
 
 @end
 
@@ -25,6 +25,27 @@
 @synthesize scrollView = _scrollView;
 @synthesize imageView = _imageView;
 @synthesize photo = _photo;
+@synthesize splitViewBarButtonItem = _splitViewBarButtonItem;
+@synthesize toolbar = _toolbar;
+
+
+- (void)awakeFromNib{
+    [super awakeFromNib];
+    // set delegate
+    self.scrollView.delegate = self;
+    
+}
+
+#pragma mark delegate
+- (void)setSplitViewBarButtonItem:(UIBarButtonItem *)splitViewBarButtonItem{
+    if (_splitViewBarButtonItem != splitViewBarButtonItem) {
+        NSMutableArray *toolBarItems = [self.toolbar.items mutableCopy];
+        if (_splitViewBarButtonItem) [toolBarItems removeObject:_splitViewBarButtonItem];
+        if (splitViewBarButtonItem) [toolBarItems insertObject:splitViewBarButtonItem atIndex:0];
+        self.toolbar.items = toolBarItems;
+        _splitViewBarButtonItem = splitViewBarButtonItem;
+    }
+}
 
 
 // refresh when Model Changed
@@ -35,14 +56,6 @@
         [self refresh];
         [self addPhotoToRecent:self.photo];
     }
-}
-
-#pragma mark view life cycle
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    // set delegate
-    self.scrollView.delegate = self;
 }
 
 

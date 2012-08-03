@@ -27,22 +27,22 @@
 @synthesize photo = _photo;
 
 
+// refresh when Model Changed
+// add photo when model changed
+- (void)setPhoto:(NSDictionary *)photo{
+    if (![_photo isEqualToDictionary:photo]) {
+        _photo = photo;
+        [self refresh];
+        [self addPhotoToRecent:self.photo];
+    }
+}
+
 #pragma mark view life cycle
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
     // set delegate
     self.scrollView.delegate = self;
-}
-
-- (void)viewWillAppear:(BOOL)animated{
-    [super viewWillAppear:animated];
-    
-    // load view in different thread
-    if (self.photo) [self refresh];
-    // add photo to recent
-    [self addPhotoToRecent:self.photo];
 }
 
 

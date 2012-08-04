@@ -36,9 +36,8 @@
     [super awakeFromNib];
     // set delegate
     self.scrollView.delegate = self;
-    
-    // hide activity base view
 }
+
 
 - (void)viewDidLoad{
     [super viewDidLoad];
@@ -69,8 +68,11 @@
         // make the view to be a blank to be prepare for indicator view
         [self removeCurrentPhotoOnView];
         _photo = photo;
-        [self refresh];
+        // add Photo to recent array
         [self addPhotoToRecent:self.photo];
+        
+        // load photo from Flickr
+        [self refresh];
     }
 }
 
@@ -80,10 +82,19 @@
 }
 
 
+// read photo either from Flickr or cache
 - (NSData*) fetchImage {
-    // Return the image from Flickr
-    return [NSData dataWithContentsOfURL:
-            [FlickrFetcher urlForPhoto:self.photo format:FlickrPhotoFormatLarge]];
+    NSData *photoData = nil;
+    
+    photoData = [self fetchPhotoFromCache];
+    if (!photoData) {
+        NSLog(@"read from Server");
+        photoData = [NSData dataWithContentsOfURL:[FlickrFetcher urlForPhoto:self.photo format:FlickrPhotoFormatLarge]];
+    }
+    else{
+        NSLog(@"read from Cache");
+    }
+    return photoData;
 }
 
 
@@ -124,10 +135,10 @@
             
             // Only store and display if another photo hasn't been selected
             if ([photoID isEqualToString:[self.photo objectForKey:PHOTO_ID_KEY]]) {
-               // [self storePhoto];
+                [self storePhoto:imageData];
                 [self synchronizeViewWithImage:imageData]; // Sets the zoom level to fill screen
                // [self fillView];
-                // have to be main thread
+                // UI involved action have to be main thread
                self.activityIndicatorBaseView.hidden = YES;
             }
         });
@@ -161,6 +172,90 @@
 #pragma mark scroll view delegate
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView{
     return self.imageView;
+}
+
+
+#pragma mark store and fetch photo
+- (void)storePhoto:(NSData *)photoData{
+    NSString *photoID = [self.photo objectForKey:PHOTO_ID_KEY];
+    //create instance of NSFileManager
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    //create an array and store result of our search for the documents directory in it
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES); 
+    
+    NSString *directory = [paths objectAtIndex:0]; //create NSString object, that holds our exact path to the documents directory
+    
+    NSString *fullPath = [directory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png", photoID]]; //add our image to the path
+    
+    [fileManager createFileAtPath:fullPath contents:photoData attributes:nil]; //finally save the path (image)
+    
+    if ([self sizeOfCacheDirOverLimit]) {
+        [self removeOldestPhoto];
+    }
+    
+    NSLog(@"image saved");
+}
+
+
+#define SIZE_LIMIT 10 * 1024
+- (BOOL)sizeOfCacheDirOverLimit{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *directory = [paths objectAtIndex:0];
+    NSError *error = nil;
+    NSDictionary *dic = [fileManager attributesOfItemAtPath:directory error:&error];
+    
+    float cachePhotoSizeInKb = ([[dic objectForKey:@"NSFileSize"] floatValue]/1024);
+    NSLog(@"file info %g", cachePhotoSizeInKb);
+    if (cachePhotoSizeInKb > SIZE_LIMIT) {
+        return YES;
+    }
+    else{
+        return NO;
+    }
+}
+
+
+- (void)removeOldestPhoto{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    // load list and reverse object order
+    id photoList = [defaults objectForKey:RECENT_PHOTOS_LIST_KEY];
+    if ([photoList isKindOfClass:[NSArray class]]) {
+        NSMutableArray *photoListArray = [photoList mutableCopy];
+        NSDictionary *photoDic = [photoListArray lastObject];
+        NSString *photoID = [photoDic objectForKey:PHOTO_ID_KEY];
+        [self removePhotoFromCache:photoID];
+        
+        // remove from NSUserDefault
+        [photoListArray removeObject:photoDic];
+        // save list to user default
+        [defaults setObject:photoListArray forKey:RECENT_PHOTOS_LIST_KEY];
+        [defaults synchronize];
+    }
+    
+}
+
+
+- (void)removePhotoFromCache:(NSString *)photoID{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *directory = [paths objectAtIndex:0];
+    NSString *fullPath = [directory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png", photoID]];
+    [fileManager removeItemAtPath: fullPath error:NULL];
+    NSLog(@"image removed");
+}
+
+
+- (NSData *)fetchPhotoFromCache{
+    NSString *photoID = [self.photo objectForKey:PHOTO_ID_KEY];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *directory = [paths objectAtIndex:0];
+    NSString *fullPath = [directory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png", photoID]];
+    NSData *photoData = [[NSData alloc] initWithContentsOfFile:fullPath];
+    
+    return photoData;
 }
 
 

@@ -23,14 +23,23 @@
 - (void)setPhotos:(NSArray *)photos{
     if (_photos != photos) {
         _photos = photos;
+        self.navigationItem.rightBarButtonItem = nil;
     }
     if (self.tableView.window) [self.tableView reloadData];
 }
 
 
+// Animating should start from view did load
+- (void)viewDidLoad{
+    [super viewDidLoad];
+    UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [spinner startAnimating];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinner];
+}
+
+
 #pragma mark segure section
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-    
     if ([segue.identifier isEqualToString:@"showAPhoto"]) {
         NSDictionary *photo = [self.photos objectAtIndex:self.tableView.indexPathForSelectedRow.row];
         [[segue destinationViewController] setPhoto:photo];

@@ -17,6 +17,8 @@
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
+@property (weak, nonatomic) IBOutlet UIView *activityIndicatorBaseView;
+
 
 @end
 
@@ -27,6 +29,7 @@
 @synthesize photo = _photo;
 @synthesize splitViewBarButtonItem = _splitViewBarButtonItem;
 @synthesize toolbar = _toolbar;
+@synthesize activityIndicatorBaseView = _activityIndicatorBaseView;
 
 
 - (void)awakeFromNib{
@@ -34,7 +37,17 @@
     // set delegate
     self.scrollView.delegate = self;
     
+    // hide activity base view
 }
+
+- (void)viewDidLoad{
+    [super viewDidLoad];
+    // iPad hide activity view otherwise not
+    if (self.splitViewController) {
+        self.activityIndicatorBaseView.hidden = YES;
+    }
+}
+
 
 #pragma mark delegate
 - (void)setSplitViewBarButtonItem:(UIBarButtonItem *)splitViewBarButtonItem{
@@ -51,11 +64,19 @@
 // refresh when Model Changed
 // add photo when model changed
 - (void)setPhoto:(NSDictionary *)photo{
-    if (![_photo isEqualToDictionary:photo]) {
+    if (![_photo isEqualToDictionary:photo]){
+        
+        // make the view to be a blank to be prepare for indicator view
+        [self removeCurrentPhotoOnView];
         _photo = photo;
         [self refresh];
         [self addPhotoToRecent:self.photo];
     }
+}
+
+
+- (void)removeCurrentPhotoOnView{
+    self.imageView.image = nil;
 }
 
 
@@ -88,7 +109,7 @@
 
 - (void)refresh {
     
-    //[self.spinner startAnimating];
+    self.activityIndicatorBaseView.hidden = NO;
     
     // Initialise the queue used to download from flickr
     dispatch_queue_t dispatchQueue = dispatch_queue_create("q_photo", NULL);
@@ -106,11 +127,12 @@
                // [self storePhoto];
                 [self synchronizeViewWithImage:imageData]; // Sets the zoom level to fill screen
                // [self fillView];
-               // [self.spinner stopAnimating];
+                // have to be main thread
+               self.activityIndicatorBaseView.hidden = YES;
             }
         });
     });   
-    dispatch_release(dispatchQueue); 
+    dispatch_release(dispatchQueue);
 }
 
 

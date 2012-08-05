@@ -116,11 +116,41 @@
                             <outlet property="delegate" destination="UCQ-bu-IKt" id="SqE-jV-bws"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Photos List" id="TXM-2B-CSc"/>
+                    <navigationItem key="navigationItem" title="Photos List" id="TXM-2B-CSc">
+                        <barButtonItem key="rightBarButtonItem" title="Map" id="Yrz-Tp-XCg">
+                            <connections>
+                                <segue destination="u7M-gx-F4h" kind="push" identifier="show map" id="7MZ-NQ-UAc"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
                 </tableViewController>
             </objects>
             <point key="canvasLocation" x="2076" y="-1237"/>
+        </scene>
+        <!--Map View Controller - Map-->
+        <scene sceneID="z6O-ZN-YG8">
+            <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iB5-RI-HKo" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <viewController id="u7M-gx-F4h" customClass="MapViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="kMQ-AH-9Jd">
+                        <rect key="frame" x="0.0" y="64" width="320" height="739"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" id="T8h-sc-G3X">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="739"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            </mapView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Map" id="Qtd-tJ-boq"/>
+                    <connections>
+                        <outlet property="mapView" destination="T8h-sc-G3X" id="fUo-vM-vI9"/>
+                    </connections>
+                </viewController>
+            </objects>
+            <point key="canvasLocation" x="2497" y="-1237"/>
         </scene>
         <!--Photo View Controller-->
         <scene sceneID="YFF-c7-6v8">
@@ -278,6 +308,12 @@
         </scene>
     </scenes>
     <classes>
+        <class className="MapViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/MapViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="mapView" candidateClass="MKMapView"/>
+            </relationships>
+        </class>
         <class className="MasterTabBarController" superclassName="UITabBarController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/MasterTabBarController.h"/>
         </class>

@@ -22,7 +22,6 @@
 
 #pragma mark implement annoation
 - (NSString *)title{
-    NSLog(@"title is %@", [self.photo objectForKey:FLICKR_PHOTO_TITLE]);
     return [self.photo objectForKey:FLICKR_PHOTO_TITLE];
 }
 
@@ -37,10 +36,8 @@
     CLLocationCoordinate2D coordinate;
     coordinate.latitude = [[self.photo objectForKey:FLICKR_LATITUDE] doubleValue];
     coordinate.longitude = [[self.photo objectForKey:FLICKR_LONGITUDE] doubleValue];
-    
     return coordinate;
 }
-
 
 
 @end

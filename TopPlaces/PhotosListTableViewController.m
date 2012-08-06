@@ -9,8 +9,10 @@
 #import "PhotosListTableViewController.h"
 #import "PhotoViewController.h"
 #import "FlickrFetcher.h"
+#import "MapViewController.h"
+#import "FlickrPhotoAnnotation.h"
 
-@interface PhotosListTableViewController ()
+@interface PhotosListTableViewController ()<MapViewControllerDelegate>
 
 
 @end
@@ -19,15 +21,21 @@
 
 @synthesize photos = _photos;
 
+
 #pragma mark getter and setter
 - (void)setPhotos:(NSArray *)photos{
     if (_photos != photos) {
         _photos = photos;
-        self.navigationItem.rightBarButtonItem = nil;
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Map" style:UIBarButtonItemStylePlain target:self action:@selector(showMap)];
     }
     if (self.tableView.window) [self.tableView reloadData];
 }
 
+
+- (void)showMap{
+    [self performSegueWithIdentifier:@"show map" sender:nil];
+    
+}
 
 // Animating should start from view did load
 - (void)viewDidLoad{
@@ -44,6 +52,34 @@
         NSDictionary *photo = [self.photos objectAtIndex:self.tableView.indexPathForSelectedRow.row];
         [[segue destinationViewController] setPhoto:photo];
     }
+    
+    if ([segue.identifier isEqualToString:@"show map"]){
+        [[segue destinationViewController] setDelegate:self];
+        // send both annotation and photo Array to Map View class
+        [[segue destinationViewController] setAnnotations:[self mapAnnotations]];
+    }
+}
+
+
+#pragma mark MapViewController Delegate
+- (UIImage *)mapViewController:(MapViewController *)sender imageForAnnotation:(id<MKAnnotation>)annotation{
+    UIImage *image = nil;
+    FlickrPhotoAnnotation *fpa = (FlickrPhotoAnnotation *)annotation;
+    NSURL *url = [FlickrFetcher urlForPhoto:fpa.photo format:FlickrPhotoFormatSquare];
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    image = [UIImage imageWithData:data];
+    
+    return image;
+}
+
+
+
+- (NSArray *)mapAnnotations{
+    NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:[self.photos count]];
+    for (NSDictionary *photo in self.photos) {
+        [annotations addObject:[FlickrPhotoAnnotation annotationForPhoto:photo]];
+    }
+    return annotations;
 }
 
 
@@ -59,8 +95,6 @@
     if (!photoTitle || [photoTitle length] == 0){
         photoTitle = @"unknow";
     }
-    
-    
     return photoTitle;
 }
 

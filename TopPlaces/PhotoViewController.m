@@ -84,9 +84,7 @@
 
 // read photo either from Flickr or cache
 - (NSData*) fetchImage {
-    NSData *photoData = nil;
-    
-    photoData = [self fetchPhotoFromCache];
+    NSData *photoData = [self fetchPhotoFromCache];
     if (!photoData) {
         NSLog(@"read from Server");
         photoData = [NSData dataWithContentsOfURL:[FlickrFetcher urlForPhoto:self.photo format:FlickrPhotoFormatLarge]];
@@ -119,7 +117,6 @@
 
 
 - (void)refresh {
-    
     self.activityIndicatorBaseView.hidden = NO;
     
     // Initialise the queue used to download from flickr

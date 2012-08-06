@@ -5,7 +5,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1498"/>
     </dependencies>
     <scenes>
-        <!--Top Places Table View Controller - Top Places-->
+        <!--Top Places Table View Controller - Top Place-->
         <scene sceneID="Lps-0V-JuN">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZUI-rw-6eJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -49,16 +49,21 @@
                             <outlet property="delegate" destination="YGk-ff-zj8" id="oiJ-ak-74F"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Top Places" id="j0b-fs-vlo">
-                        <barButtonItem key="rightBarButtonItem" title="Refresh" id="skx-aQ-FS0">
+                    <navigationItem key="navigationItem" title="Top Place" id="j0b-fs-vlo">
+                        <barButtonItem key="leftBarButtonItem" title="Refresh" id="oZn-90-1Pn">
                             <connections>
-                                <action selector="refresh:" destination="YGk-ff-zj8" id="yeW-6Y-BIY"/>
+                                <action selector="refresh:" destination="YGk-ff-zj8" id="dDq-Bf-feR"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Map" id="skx-aQ-FS0">
+                            <connections>
+                                <segue destination="nQ9-Wz-u41" kind="push" identifier="show map" id="JV1-ZK-emo"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                 </tableViewController>
             </objects>
-            <point key="canvasLocation" x="1310" y="108"/>
+            <point key="canvasLocation" x="1317" y="108"/>
         </scene>
         <!--Photos List Table View Controller - Photos List-->
         <scene sceneID="pza-Oa-c8d">
@@ -104,10 +109,16 @@
                             <outlet property="delegate" destination="Qxa-Hp-oST" id="Xx6-Z0-nHx"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Photos List" id="alB-lx-FqR"/>
+                    <navigationItem key="navigationItem" title="Photos List" id="alB-lx-FqR">
+                        <barButtonItem key="rightBarButtonItem" title="Map" id="mUs-Jm-RL2">
+                            <connections>
+                                <segue destination="nQ9-Wz-u41" kind="push" identifier="show map" id="73C-lc-33G"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
             </objects>
-            <point key="canvasLocation" x="1706" y="108"/>
+            <point key="canvasLocation" x="1857" y="-563"/>
         </scene>
         <!--Photo View Controller-->
         <scene sceneID="Qxm-8x-p9i">
@@ -151,7 +162,7 @@
                     </connections>
                 </viewController>
             </objects>
-            <point key="canvasLocation" x="2356" y="733"/>
+            <point key="canvasLocation" x="2977" y="-175"/>
         </scene>
         <!--Recent Photos Table View Controller - Recent-->
         <scene sceneID="nBX-Wy-FRP">
@@ -197,7 +208,13 @@
                             <outlet property="delegate" destination="2OJ-l5-WJw" id="jw6-Xl-jCw"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Recent" id="x8I-yh-XNS"/>
+                    <navigationItem key="navigationItem" title="Recent" id="x8I-yh-XNS">
+                        <barButtonItem key="rightBarButtonItem" title="Map" id="Iuz-cW-emV">
+                            <connections>
+                                <segue destination="nQ9-Wz-u41" kind="push" identifier="show map" id="9Q8-Ee-61l"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
             </objects>
             <point key="canvasLocation" x="1334" y="745"/>
@@ -258,36 +275,40 @@
             </objects>
             <point key="canvasLocation" x="885" y="745"/>
         </scene>
+        <!--Map View Controller - Map-->
+        <scene sceneID="RE8-av-7uZ">
+            <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="GI6-wG-tRV" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <viewController id="nQ9-Wz-u41" customClass="MapViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="bWs-gT-2sM">
+                        <rect key="frame" x="0.0" y="64" width="320" height="367"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" id="5sv-kZ-Do4">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="367"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            </mapView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Map" id="1kw-hr-hDE"/>
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+                    <connections>
+                        <outlet property="mapView" destination="5sv-kZ-Do4" id="3EZ-Bi-Lca"/>
+                        <segue destination="uwV-Pb-7Ye" kind="push" identifier="show photo detail" id="8bJ-hq-DkM"/>
+                    </connections>
+                </viewController>
+            </objects>
+            <point key="canvasLocation" x="2452" y="736"/>
+        </scene>
     </scenes>
-    <classes>
-        <class className="PhotoViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/PhotoViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="activityIndicatorBaseView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="imageView" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
-                <relationship kind="outlet" name="toolbar" candidateClass="UIToolbar"/>
-            </relationships>
-        </class>
-        <class className="PhotosListTableViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/PhotosListTableViewController.h"/>
-        </class>
-        <class className="RecentPhotosTableViewController" superclassName="PhotosListTableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/RecentPhotosTableViewController.h"/>
-        </class>
-        <class className="TopPlacesTableViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/TopPlacesTableViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="refresh:" candidateClass="UIBarButtonItem"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="aW4-8P-VsB"/>
+        <segue reference="8bJ-hq-DkM"/>
+        <segue reference="JV1-ZK-emo"/>
     </inferredMetricsTieBreakers>
 </document>

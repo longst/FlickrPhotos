@@ -8,8 +8,10 @@
 
 #import "TopPlacesTableViewController.h"
 #import "FlickrFetcher.h"
+#import "MapViewController.h"
+#import "FlickrPhotoAnnotation.h"
 
-@interface TopPlacesTableViewController ()
+@interface TopPlacesTableViewController () <MapViewControllerDelegate>
 
 // extra task, photo by countries data structure
 @property (nonatomic, strong) NSDictionary *photosByCountries;
@@ -49,15 +51,22 @@ typedef enum{
 }
 
 
-#pragma mark - Segue handleing
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-    // TODO.think about how it works
-    /**
-     UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-     [spinner startAnimating];
-     [self.view addSubview:spinner];
-     */
+// TODO, think about this part of code
+#pragma mark MapViewController Delegate
+- (UIImage *)mapViewController:(MapViewController *)sender imageForAnnotation:(id<MKAnnotation>)annotation{
+    UIImage *image = nil;
+    FlickrPhotoAnnotation *fpa = (FlickrPhotoAnnotation *)annotation;
+    NSURL *url = [FlickrFetcher urlForPhoto:fpa.photo format:FlickrPhotoFormatSquare];
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    image = [UIImage imageWithData:data];
     
+    return image;
+}
+
+
+
+#pragma mark - Segue handleing
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{    
     if ([segue.identifier isEqualToString:@"showPhotoList"]){
         // get select section
         NSString *photoByCountry = [self photosByCountriesForSection: self.tableView.indexPathForSelectedRow.section];
@@ -77,10 +86,21 @@ typedef enum{
             });
         });
     }
-    [[self.view.subviews mutableCopy] removeLastObject];
     
-    
+    else if ([segue.identifier isEqualToString:@"show map"]){
+        [[segue destinationViewController] setAnnotations:[self photosAnnotation]];
+    }
 }
+
+
+- (NSArray*)photosAnnotation{
+    NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:[self.photos count]];
+    for (NSDictionary *photo in self.photos) {
+        [annotations addObject:[FlickrPhotoAnnotation annotationForPhoto:photo]];
+    }
+    return annotations;
+}
+
 
 #pragma mark - view life cycle
 - (void)viewDidLoad{
@@ -97,7 +117,7 @@ typedef enum{
 - (IBAction)refresh:(UIBarButtonItem *)sender {
     UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     [spinner startAnimating];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinner];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinner];
     [self downloadFlickrFetcher:sender];
 }
 
@@ -110,7 +130,7 @@ typedef enum{
         NSArray *photos = [FlickrFetcher topPlaces];
         dispatch_async(dispatch_get_main_queue(), ^{
             if ([sender isKindOfClass:[UIBarButtonItem class]]) {
-                self.navigationItem.rightBarButtonItem = sender;
+                self.navigationItem.leftBarButtonItem = sender;
             }
             self.photos = photos;
         });

@@ -48,15 +48,6 @@
 
 
 - (void)splitViewController:(UISplitViewController *)svc
-          popoverController:(UIPopoverController *)pc
-  willPresentViewController:(UIViewController *)aViewController
-{
-    // We save this so as we can dismiss it when we select a picture
-
-}
-
-
-- (void)splitViewController:(UISplitViewController *)svc
      willShowViewController:(UIViewController *)aViewController
   invalidatingBarButtonItem:(UIBarButtonItem *)barButtonItem{
     // remove button from detail view controller

@@ -51,7 +51,8 @@ typedef enum{
 }
 
 
-// TODO, think about this part of code
+// This part of code is as same as the PhotoListTableViewController, How I am able to reuse the
+// code from PhotosListTableViewController
 #pragma mark MapViewController Delegate
 - (UIImage *)mapViewController:(MapViewController *)sender imageForAnnotation:(id<MKAnnotation>)annotation{
     UIImage *image = nil;

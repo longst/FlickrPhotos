@@ -14,6 +14,7 @@
 
 @protocol MapViewControllerDelegate <NSObject>
 
+// delegation show callout picture
 - (UIImage *)mapViewController:(MapViewController *)sender imageForAnnotation:(id <MKAnnotation>)annotation;
 
 @end

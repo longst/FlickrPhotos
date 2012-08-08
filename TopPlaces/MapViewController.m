@@ -17,6 +17,7 @@
 @end
 
 @implementation MapViewController
+
 @synthesize mapView = _mapView;
 @synthesize annotations = _annotations;
 @synthesize delegate = _delegate;
@@ -35,10 +36,12 @@
 }
 
 
-
 // lecture 11 around 46:57, when I was seguing, the outlet is not set, in this case, self.mapView is not set
 // therefore, we have to make view and model sync like this
 - (void)updateMapView{
+    NSLog(@"self.mapView %@", self.mapView);
+    
+    
     if(self.mapView.annotations) [self.mapView removeAnnotations:self.mapView.annotations];
     if (self.annotations) [self.mapView addAnnotations:self.annotations];
 }
@@ -52,6 +55,14 @@
         aView.canShowCallout = YES;
         // 30 30 from lecture 11
         aView.leftCalloutAccessoryView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
+        
+        // add show detail button
+        UIButton *advertButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        advertButton.frame = CGRectMake(0, 0, 23, 23);
+        advertButton.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+        advertButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
+        aView.rightCalloutAccessoryView = advertButton;
+        
     }
     aView.annotation = annotation;
     [(UIImageView *)aView.leftCalloutAccessoryView setImage:nil];
@@ -69,13 +80,8 @@
 }
 
 
-// TODO add a button show detail image
-// Think about if it possible first show callout, next chick show detail
-- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view{
-    UIImage *image = [self.delegate mapViewController:self imageForAnnotation:view.annotation];
-    // implement show detal view
-    [(UIImageView *)view.leftCalloutAccessoryView setImage:image];
-    
+// a temp button for detail view
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control{
     FlickrPhotoAnnotation *fpa = (FlickrPhotoAnnotation *)view.annotation;
     if ([self splitViewPhotoViewController]) {
         [[self splitViewPhotoViewController] setPhoto:fpa.photo];
@@ -83,7 +89,14 @@
     else{
         [self performSegueWithIdentifier:@"show photo detail" sender:fpa.photo];
     }
+    
+}
 
+// Think about solution that put [self.delegate mapViewController:self imageForAnnotation:view.annotation];
+// in to different thread.
+- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view{
+    UIImage *image = [self.delegate mapViewController:self imageForAnnotation:view.annotation];
+    [(UIImageView *)view.leftCalloutAccessoryView setImage:image];
 }
 
 

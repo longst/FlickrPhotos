@@ -64,9 +64,14 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Top Place" id="QOe-vW-0tb">
-                        <barButtonItem key="rightBarButtonItem" title="Refresh" id="ToZ-16-tzO">
+                        <barButtonItem key="leftBarButtonItem" title="Refresh" id="ToZ-16-tzO">
                             <connections>
                                 <action selector="refresh:" destination="tGL-Np-hNd" id="bwg-rL-U5W"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Map" id="4Ww-cG-qbk">
+                            <connections>
+                                <segue destination="Qmr-TX-1wI" kind="push" identifier="show map" id="sAj-uB-bkj"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -126,7 +131,7 @@
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
                 </tableViewController>
             </objects>
-            <point key="canvasLocation" x="2076" y="-1237"/>
+            <point key="canvasLocation" x="2212" y="-2301"/>
         </scene>
         <!--Map View Controller - Map-->
         <scene sceneID="z6O-ZN-YG8">
@@ -150,7 +155,7 @@
                     </connections>
                 </viewController>
             </objects>
-            <point key="canvasLocation" x="2497" y="-1237"/>
+            <point key="canvasLocation" x="2773" y="-1237"/>
         </scene>
         <!--Photo View Controller-->
         <scene sceneID="YFF-c7-6v8">
@@ -306,39 +311,31 @@
             </objects>
             <point key="canvasLocation" x="1230" y="-245"/>
         </scene>
+        <!--Map View Controller - Map-->
+        <scene sceneID="93b-lP-8qy">
+            <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="zaQ-De-K3k" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <viewController id="Qmr-TX-1wI" customClass="MapViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="ToD-UA-j53">
+                        <rect key="frame" x="0.0" y="64" width="320" height="739"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" id="Iaf-wJ-D2j">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="739"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            </mapView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Map" id="YvV-TG-Vrw"/>
+                    <connections>
+                        <outlet property="mapView" destination="Iaf-wJ-D2j" id="FPR-qb-djg"/>
+                    </connections>
+                </viewController>
+            </objects>
+            <point key="canvasLocation" x="2236" y="-1229"/>
+        </scene>
     </scenes>
-    <classes>
-        <class className="MapViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/MapViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="mapView" candidateClass="MKMapView"/>
-            </relationships>
-        </class>
-        <class className="MasterTabBarController" superclassName="UITabBarController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/MasterTabBarController.h"/>
-        </class>
-        <class className="PhotoViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/PhotoViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="activityIndicatorBaseView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="imageView" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
-                <relationship kind="outlet" name="toolbar" candidateClass="UIToolbar"/>
-            </relationships>
-        </class>
-        <class className="PhotosListTableViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/PhotosListTableViewController.h"/>
-        </class>
-        <class className="RecentPhotosTableViewController" superclassName="PhotosListTableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/RecentPhotosTableViewController.h"/>
-        </class>
-        <class className="TopPlacesTableViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/TopPlacesTableViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="refresh:" candidateClass="UIBarButtonItem"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>
